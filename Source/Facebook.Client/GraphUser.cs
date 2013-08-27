@@ -21,34 +21,68 @@
         {
         }
 
+#if NODYNAMIC
         /// <summary>
-        /// Initializes a new instance of the GraphUser class from a dynamic object returned by the Facebook API.
+        /// Initializes a new instance of the GraphUser class from a JsonObject returned by the Facebook API.
         /// </summary>
-        /// <param name="user">The dynamic object representing the Facebook user.</param>
-        public GraphUser(dynamic user)
+        /// <param name="user">The JsonObject representing the Facebook user.</param>
+        public GraphUser(object user)
             : base((IDictionary<string, object>)user)
-        {
-            if (user == null)
-            {
-                throw new ArgumentNullException("user");
-            }
+		{
+			if (user == null)
+			{
+				throw new ArgumentNullException("user");
+			}
 
-            this.Id = user.id;
-            this.Name = user.name;
-            this.UserName = user.username;
-            this.FirstName = user.first_name;
-            this.MiddleName = user.middle_name;
-            this.LastName = user.last_name;
-            this.Birthday = user.birthday;
-            dynamic location = user.location;
-            this.Location = (location != null) ? new GraphLocation(location) : null;
-            this.Link = user.link;
-            var picture = user.picture;
-            if (picture != null)
-            {
-                Uri.TryCreate(picture.data.url, UriKind.Absolute, out this.profilePictureUrl);
-            }
-        }
+			JsonObject json = (JsonObject)user;
+
+			this.Id = json["id"];
+			this.Name = json["name"];
+			this.UserName = json["username"];
+			this.FirstName = json["first_name"];
+			this.MiddleName = json["middle_name"];
+			this.LastName = json["last_name"];
+			this.Birthday = json["birthday"];
+			object location = json["location"];
+			this.Location = (location != null) ? new GraphLocation(location) : null;
+			this.Link = json["link"];
+			object picture = json["picture"];
+			if (picture != null)
+			{
+				JsonObject data = picture ["data"];
+				Uri.TryCreate(data["url"], UriKind.Absolute, out this.profilePictureUrl);
+			}
+		}
+#else
+		/// <summary>
+		/// Initializes a new instance of the GraphUser class from a dynamic object returned by the Facebook API.
+		/// </summary>
+		/// <param name="user">The dynamic object representing the Facebook user.</param>
+		public GraphUser(dynamic user)
+		: base((IDictionary<string, object>)user)
+		{
+			if (user == null)
+			{
+				throw new ArgumentNullException("user");
+			}
+
+			this.Id = user.id;
+			this.Name = user.name;
+			this.UserName = user.username;
+			this.FirstName = user.first_name;
+			this.MiddleName = user.middle_name;
+			this.LastName = user.last_name;
+			this.Birthday = user.birthday;
+			dynamic location = user.location;
+			this.Location = (location != null) ? new GraphLocation(location) : null;
+			this.Link = user.link;
+			var picture = user.picture;
+			if (picture != null)
+			{
+				Uri.TryCreate(picture.data.url, UriKind.Absolute, out this.profilePictureUrl);
+			}
+		}
+#endif
 
         /// <summary>
         /// Gets or sets the ID of the user.

@@ -18,11 +18,12 @@
         {
         }
 
-        /// <summary>
-        /// Initializes a new instance of the GraphLocation class from a dynamic object returned by the Facebook API.
+#if NODYNAMIC
+		/// <summary>
+        /// Initializes a new instance of the GraphLocation class from a JsonObject returned by the Facebook API.
         /// </summary>
-        /// <param name="location">The dynamic object representing the Facebook location.</param>
-        public GraphLocation(dynamic location)
+        /// <param name="location">The JsonObject representing the Facebook location.</param>
+        public GraphLocation(object location)
             : base((IDictionary<string, object>)location)
         {
             if (location == null)
@@ -30,14 +31,38 @@
                 throw new ArgumentNullException("location");
             }
 
-            this.Street = location.street;
-            this.City = location.name;
-            this.State = location.state;
-            this.Zip = location.zip;
-            this.Country = location.country;
-            this.Latitude = location.latitude ?? 0.0;
-            this.Longitude = location.longitude ?? 0.0;
+			JsonObject json = (JsonObject)location;
+
+            this.Street = json["street"];
+            this.City = json["name"];
+            this.State = json["state"];
+            this.Zip = json["zip"];
+            this.Country = json["country"];
+            this.Latitude = json["latitude"] ?? 0.0;
+            this.Longitude = json["longitude"] ?? 0.0;
         }
+#else
+		/// <summary>
+		/// Initializes a new instance of the GraphLocation class from a dynamic object returned by the Facebook API.
+		/// </summary>
+		/// <param name="location">The dynamic object representing the Facebook location.</param>
+		public GraphLocation(dynamic location)
+			: base((IDictionary<string, object>)location)
+		{
+			if (location == null)
+			{
+				throw new ArgumentNullException("location");
+			}
+
+			this.Street = location.street;
+			this.City = location.name;
+			this.State = location.state;
+			this.Zip = location.zip;
+			this.Country = location.country;
+			this.Latitude = location.latitude ?? 0.0;
+			this.Longitude = location.longitude ?? 0.0;
+		}
+#endif
 
         /// <summary>
         /// Gets or sets the street component of the location.

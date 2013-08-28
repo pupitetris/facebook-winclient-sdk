@@ -31,7 +31,7 @@ using Windows.Security.Authentication.Web;
 
 namespace Facebook.Client
 {
-#if __MonoCS__
+#if __MOBILE__
 	// Provide this Authentication.Web enum to avoid further code modification.
 	public enum WebAuthenticationOptions {
 		None
@@ -66,7 +66,7 @@ namespace Facebook.Client
                 {
                     AnalyticsSent = true;
 
-#if !(WINDOWS_PHONE) && !(__MonoCS__)
+#if !(WINDOWS_PHONE) && !(__MOBILE__)
                     Version assemblyVersion = typeof(FacebookSessionClient).GetTypeInfo().Assembly.GetName().Version;
 #else
                     Version assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version;
@@ -190,7 +190,7 @@ namespace Facebook.Client
 			Uri startUri = this.GetLoginUrl(permissions);
 			Uri endUri = new Uri("https://www.facebook.com/connect/login_success.html");
 
-#if __MonoCS__
+#if __MOBILE__
 			var auth = new FacebookAuthenticator (this.AppId, startUri, endUri);
 			Xamarin.Auth.Account account = await auth.AuthenticateAsync ();
 			var request = new Xamarin.Auth.OAuth2Request ("GET", new Uri ("https://graph.facebook.com/me"), null, account);
@@ -225,7 +225,7 @@ namespace Facebook.Client
             parameters["client_id"] = this.AppId;
             parameters["redirect_uri"] = "https://www.facebook.com/connect/login_success.html";
             parameters["response_type"] = "token";
-#if WINDOWS_PHONE || __MonoCS__
+#if WINDOWS_PHONE || __MOBILE__
             parameters["display"] = "touch";
             parameters["mobile"] = true;
 #else

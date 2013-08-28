@@ -28,9 +28,18 @@ using System.Threading.Tasks;
 #if NETFX_CORE
 using Windows.Security.Authentication.Web;
 #endif
+#if __MonoCS__
+using Xamarin.Auth;
+#endif
 
 namespace Facebook.Client
 {
+#if __MonoCS__
+	public enum WebAuthenticationOptions {
+		None
+	}
+#endif
+
     public class FacebookSessionClient
     {
         public string AppId { get; set; }
@@ -59,7 +68,7 @@ namespace Facebook.Client
                 {
                     AnalyticsSent = true;
 
-#if !(WINDOWS_PHONE)
+#if !(WINDOWS_PHONE) && !(__MonoCS__)
                     Version assemblyVersion = typeof(FacebookSessionClient).GetTypeInfo().Assembly.GetName().Version;
 #else
                     Version assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version;
@@ -180,10 +189,50 @@ namespace Facebook.Client
 
         private async Task<FacebookOAuthResult> PromptOAuthDialog(string permissions, WebAuthenticationOptions options)
         {
-            // Use WebAuthenticationBroker to launch server side OAuth flow
+			Uri startUri = this.GetLoginUrl(permissions);
+			Uri endUri = new Uri("https://www.facebook.com/connect/login_success.html");
 
-            Uri startUri = this.GetLoginUrl(permissions);
-            Uri endUri = new Uri("https://www.facebook.com/connect/login_success.html");
+#if __MonoCS__
+			var auth = new FacebookAuthenticator (this.AppId, "", startUri, endUri);
+			Account account;
+			Task<Uri> getUri = new Task<Uri>(() => {
+				Uri result;
+
+				// Here wait for auth.Completed to be called.
+
+				// Now proceed getting user info.
+				var request = new OAuth2Request ("GET", new Uri ("https://graph.facebook.com/me"), null, account);
+				request.GetResponseAsync().ContinueWith (t => {
+					if (t.IsFaulted)
+						throw new InvalidOperationException();
+					else if (t.IsCanceled)
+						throw new InvalidOperationException();
+
+					result = t.Result.ResponseUri;
+				});
+
+				return result;
+			});
+
+			auth.Completed += (object sender, AuthenticatorCompletedEventArgs eventArgs) => {
+				auth.DismissUI ();
+				
+				if (!eventArgs.IsAuthenticated) {
+					// tell getUri that things didn't work out.
+					return;
+				}
+
+				account = eventArgs.Account;
+
+				// Signal getUri that we can continue now.
+			};
+
+			auth.SetupUI ();
+
+			Uri callbackUrl = await getUri;
+
+#else
+            // Use WebAuthenticationBroker to launch server side OAuth flow
 
             var result = await WebAuthenticationBroker.AuthenticateAsync(options, startUri, endUri);
 
@@ -197,8 +246,11 @@ namespace Facebook.Client
                 throw new InvalidOperationException();
             }
 
+			Uri callbackUrl = new Uri(result.ResponseData);
+#endif
+
             var client = new FacebookClient();
-            var authResult = client.ParseOAuthCallbackUrl(new Uri(result.ResponseData));
+            var authResult = client.ParseOAuthCallbackUrl(callbackUrl);
             return authResult;
         }
 
@@ -208,7 +260,7 @@ namespace Facebook.Client
             parameters["client_id"] = this.AppId;
             parameters["redirect_uri"] = "https://www.facebook.com/connect/login_success.html";
             parameters["response_type"] = "token";
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || __MonoCS__
             parameters["display"] = "touch";
             parameters["mobile"] = true;
 #else

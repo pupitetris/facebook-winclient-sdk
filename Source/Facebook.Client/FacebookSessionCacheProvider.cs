@@ -17,7 +17,7 @@ namespace Facebook.Client
             {
                 if (current == null)
                 {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || __MonoCS__
                     current = new FacebookSessionIsolatedStorageCacheProvider();
 #else
                     current = new FacebookSessionRoamingSettingsCacheProvider();

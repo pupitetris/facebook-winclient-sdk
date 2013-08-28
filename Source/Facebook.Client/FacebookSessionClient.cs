@@ -28,13 +28,11 @@ using System.Threading.Tasks;
 #if NETFX_CORE
 using Windows.Security.Authentication.Web;
 #endif
-#if __MonoCS__
-using Xamarin.Auth;
-#endif
 
 namespace Facebook.Client
 {
 #if __MonoCS__
+	// Provide this Authentication.Web enum to avoid further code modification.
 	public enum WebAuthenticationOptions {
 		None
 	}
@@ -193,44 +191,11 @@ namespace Facebook.Client
 			Uri endUri = new Uri("https://www.facebook.com/connect/login_success.html");
 
 #if __MonoCS__
-			var auth = new FacebookAuthenticator (this.AppId, "", startUri, endUri);
-			Account account;
-			Task<Uri> getUri = new Task<Uri>(() => {
-				Uri result;
-
-				// Here wait for auth.Completed to be called.
-
-				// Now proceed getting user info.
-				var request = new OAuth2Request ("GET", new Uri ("https://graph.facebook.com/me"), null, account);
-				request.GetResponseAsync().ContinueWith (t => {
-					if (t.IsFaulted)
-						throw new InvalidOperationException();
-					else if (t.IsCanceled)
-						throw new InvalidOperationException();
-
-					result = t.Result.ResponseUri;
-				});
-
-				return result;
-			});
-
-			auth.Completed += (object sender, AuthenticatorCompletedEventArgs eventArgs) => {
-				auth.DismissUI ();
-				
-				if (!eventArgs.IsAuthenticated) {
-					// tell getUri that things didn't work out.
-					return;
-				}
-
-				account = eventArgs.Account;
-
-				// Signal getUri that we can continue now.
-			};
-
-			auth.SetupUI ();
-
-			Uri callbackUrl = await getUri;
-
+			var auth = new FacebookAuthenticator (this.AppId, startUri, endUri);
+			Xamarin.Auth.Account account = await auth.AuthenticateAsync ();
+			var request = new Xamarin.Auth.OAuth2Request ("GET", new Uri ("https://graph.facebook.com/me"), null, account);
+			var result = await request.GetResponseAsync ();
+			Uri callbackUrl = result.ResponseUri;
 #else
             // Use WebAuthenticationBroker to launch server side OAuth flow
 
@@ -277,8 +242,5 @@ namespace Facebook.Client
             var client = new FacebookClient();
             return client.GetLoginUrl(parameters);
         }
-
-
-
     }
 }

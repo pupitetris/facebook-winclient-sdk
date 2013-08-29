@@ -36,21 +36,21 @@
 
 			JsonObject json = (JsonObject)user;
 
-			this.Id = json["id"];
-			this.Name = json["name"];
-			this.UserName = json["username"];
-			this.FirstName = json["first_name"];
-			this.MiddleName = json["middle_name"];
-			this.LastName = json["last_name"];
-			this.Birthday = json["birthday"];
+			this.Id = json["id"] as string;
+			this.Name = json["name"] as string;
+			this.UserName = json["username"] as string;
+			this.FirstName = json["first_name"] as string;
+			this.MiddleName = json["middle_name"] as string;
+			this.LastName = json["last_name"] as string;
+			this.Birthday = json["birthday"] as string;
 			object location = json["location"];
 			this.Location = (location != null) ? new GraphLocation(location) : null;
-			this.Link = json["link"];
-			object picture = json["picture"];
+			this.Link = json["link"] as string;
+			JsonObject picture = json["picture"] as JsonObject;
 			if (picture != null)
 			{
-				JsonObject data = picture ["data"];
-				Uri.TryCreate(data["url"], UriKind.Absolute, out this.profilePictureUrl);
+				JsonObject data = picture ["data"] as JsonObject;
+				Uri.TryCreate(data["url"] as string, UriKind.Absolute, out this.profilePictureUrl);
 			}
 		}
 #else

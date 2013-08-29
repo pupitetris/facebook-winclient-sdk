@@ -33,13 +33,13 @@
 
 			JsonObject json = (JsonObject)location;
 
-            this.Street = json["street"];
-            this.City = json["name"];
-            this.State = json["state"];
-            this.Zip = json["zip"];
-            this.Country = json["country"];
-            this.Latitude = json["latitude"] ?? 0.0;
-            this.Longitude = json["longitude"] ?? 0.0;
+            this.Street = json["street"] as string;
+			this.City = json["name"] as string;
+			this.State = json["state"] as string;
+			this.Zip = json["zip"] as string;
+			this.Country = json["country"] as string;
+            this.Latitude = (double) (json["latitude"] ?? 0.0);
+            this.Longitude = (double) (json["longitude"] ?? 0.0);
         }
 #else
 		/// <summary>

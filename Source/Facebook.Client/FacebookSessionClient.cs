@@ -31,6 +31,7 @@ using Windows.Security.Authentication.Web;
 
 namespace Facebook.Client
 {
+
 #if __MOBILE__
 	// Provide this Authentication.Web enum to avoid further code modification.
 	public enum WebAuthenticationOptions {
@@ -38,7 +39,7 @@ namespace Facebook.Client
 	}
 #endif
 
-    public class FacebookSessionClient
+	public partial class FacebookSessionClient
     {
         public string AppId { get; set; }
         public bool LoginInProgress { get; set; }
@@ -191,7 +192,7 @@ namespace Facebook.Client
 			Uri endUri = new Uri("https://www.facebook.com/connect/login_success.html");
 
 #if __MOBILE__
-			var auth = new FacebookAuthenticator (this.AppId, startUri, endUri);
+			var auth = NewFacebookAuthenticator (startUri, endUri);
 			Xamarin.Auth.Account account = await auth.AuthenticateAsync ();
 			var request = new Xamarin.Auth.OAuth2Request ("GET", new Uri ("https://graph.facebook.com/me"), null, account);
 			var result = await request.GetResponseAsync ();

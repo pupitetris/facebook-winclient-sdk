@@ -186,6 +186,7 @@ namespace Facebook.Client
             }
         }
 
+		// The second arg, options, is ignored.
         private async Task<FacebookOAuthResult> PromptOAuthDialog(string permissions, WebAuthenticationOptions options)
         {
 			Uri startUri = this.GetLoginUrl(permissions);

@@ -34,23 +34,26 @@
 				throw new ArgumentNullException("user");
 			}
 
-			JsonObject json = (JsonObject)user;
-
-			this.Id = json["id"] as string;
-			this.Name = json["name"] as string;
-			this.UserName = json["username"] as string;
-			this.FirstName = json["first_name"] as string;
-			this.MiddleName = json["middle_name"] as string;
-			this.LastName = json["last_name"] as string;
-			this.Birthday = json["birthday"] as string;
-			object location = json["location"];
+			this.Id = this["id"] as string;
+			this.Name = this["name"] as string;
+			this.UserName = this["username"] as string;
+			this.FirstName = this["first_name"] as string;
+			this.MiddleName = this["middle_name"] as string;
+			this.LastName = this["last_name"] as string;
+			this.Birthday = this["birthday"] as string;
+			object location = this["location"];
 			this.Location = (location != null) ? new GraphLocation(location) : null;
-			this.Link = json["link"] as string;
-			JsonObject picture = json["picture"] as JsonObject;
+			this.Link = this["link"] as string;
+			JsonObject picture = this["picture"] as JsonObject;
 			if (picture != null)
 			{
-				JsonObject data = picture ["data"] as JsonObject;
-				Uri.TryCreate(data["url"] as string, UriKind.Absolute, out this.profilePictureUrl);
+				if (picture.ContainsKey ("data")) {
+			    	JsonObject data = picture["data"] as JsonObject;
+					if (data != null && data.ContainsKey ("url")) 
+					{
+						Uri.TryCreate (data["url"], UriKind.Absolute, out this.profilePictureUrl);
+					}
+				}
 			}
 		}
 #else

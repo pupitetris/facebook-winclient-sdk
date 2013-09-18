@@ -31,15 +31,13 @@
                 throw new ArgumentNullException("location");
             }
 
-			JsonObject json = (JsonObject)location;
-
-            this.Street = json["street"] as string;
-			this.City = json["name"] as string;
-			this.State = json["state"] as string;
-			this.Zip = json["zip"] as string;
-			this.Country = json["country"] as string;
-            this.Latitude = (double) (json["latitude"] ?? 0.0);
-            this.Longitude = (double) (json["longitude"] ?? 0.0);
+            this.Street = this["street"] as string;
+			this.City = this["name"] as string;
+			this.State = this["state"] as string;
+			this.Zip = this["zip"] as string;
+			this.Country = this["country"] as string;
+            this.Latitude = (double) (this["latitude"] ?? 0.0);
+            this.Longitude = (double) (this["longitude"] ?? 0.0);
         }
 #else
 		/// <summary>

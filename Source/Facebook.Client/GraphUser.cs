@@ -44,11 +44,11 @@
 			object location = this["location"];
 			this.Location = (location != null) ? new GraphLocation(location) : null;
 			this.Link = this["link"] as string;
-			JsonObject picture = this["picture"] as JsonObject;
+			IDictionary<string, object> picture = this["picture"] as IDictionary<string, object>;
 			if (picture != null)
 			{
 				if (picture.ContainsKey ("data")) {
-			    	JsonObject data = picture["data"] as JsonObject;
+					IDictionary<string, object> data = picture["data"] as IDictionary<string, object>;
 					if (data != null && data.ContainsKey ("url")) 
 					{
 						Uri.TryCreate (data["url"] as string, UriKind.Absolute, out this.profilePictureUrl);

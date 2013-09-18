@@ -51,7 +51,7 @@
 			    	JsonObject data = picture["data"] as JsonObject;
 					if (data != null && data.ContainsKey ("url")) 
 					{
-						Uri.TryCreate (data["url"], UriKind.Absolute, out this.profilePictureUrl);
+						Uri.TryCreate (data["url"] as string, UriKind.Absolute, out this.profilePictureUrl);
 					}
 				}
 			}

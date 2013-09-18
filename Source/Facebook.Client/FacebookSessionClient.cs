@@ -194,10 +194,8 @@ namespace Facebook.Client
 
 #if __MOBILE__
 			var auth = NewFacebookAuthenticator (startUri, endUri);
-			Xamarin.Auth.Account account = await auth.AuthenticateAsync ();
-			var request = new Xamarin.Auth.OAuth2Request ("GET", new Uri ("https://graph.facebook.com/me"), null, account);
-			var result = await request.GetResponseAsync ();
-			Uri callbackUrl = result.ResponseUri;
+			await auth.AuthenticateAsync ();
+			Uri callbackUrl = auth.CallbackUri;
 #else
             // Use WebAuthenticationBroker to launch server side OAuth flow
 

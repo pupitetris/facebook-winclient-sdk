@@ -5,10 +5,12 @@
     using System.Globalization;
     using System.Linq;
 #endif
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || __MOBILE__
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
+#endif
+#if WINDOWS_PHONE
     using Microsoft.Phone.Globalization;
 #endif
     /// <summary>

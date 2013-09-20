@@ -4,13 +4,20 @@
     using System.ComponentModel;
     using Windows.UI.Xaml;
 #endif
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || __MOBILE__
     using System.ComponentModel;
-    using System.Windows;
+#endif
+#if WINDOWS_PHONE
+	using System.Windows;
 #endif
 
-    internal class PickerItem<T> : DependencyObject, INotifyPropertyChanged
-        where T : class
+#if !__MOBILE__
+	internal class PickerItem<T> : DependencyObject, INotifyPropertyChanged
+		where T : class
+#else
+	internal class PickerItem<T> : INotifyPropertyChanged
+		where T : class
+#endif
     {
         private object parent;
 

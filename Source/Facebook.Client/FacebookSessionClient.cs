@@ -34,8 +34,9 @@ namespace Facebook.Client
 
 #if __MOBILE__
 	// Provide this Authentication.Web enum to avoid further code modification.
-	public enum WebAuthenticationOptions {
-		None
+	internal enum WebAuthenticationOptions {
+		None,
+		SilentMode
 	}
 #endif
 

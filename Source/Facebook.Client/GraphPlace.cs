@@ -21,11 +21,12 @@
         {
         }
 
+#if NODYNAMIC
         /// <summary>
         /// Initializes a new instance of the GraphPlace class from a dynamic object returned by the Facebook API.
         /// </summary>
         /// <param name="place">The dynamic object representing the Facebook place.</param>
-        public GraphPlace(dynamic place)
+        public GraphPlace(object place)
             : base((IDictionary<string, object>)place)
         {
             if (place == null)
@@ -33,16 +34,46 @@
                 throw new ArgumentNullException("place");
             }
 
-            this.Id = place.id;
-            this.Name = place.name;
-            dynamic location = place.location;
+            this.Id = this["id"] as string;
+            this.Name = this["name"] as string;
+            object location = this["location"];
             this.Location = (location != null) ? new GraphLocation(location) : null;
-            var picture = place.picture;
-            if (picture != null)
-            {
-                Uri.TryCreate(picture.data.url, UriKind.Absolute, out this.pictureUrl);
-            }
+			IDictionary<string, object> picture = this["picture"] as IDictionary<string, object>;
+			if (picture != null)
+			{
+				if (picture.ContainsKey ("data")) {
+					IDictionary<string, object> data = picture["data"] as IDictionary<string, object>;
+					if (data != null && data.ContainsKey ("url")) 
+					{
+						Uri.TryCreate (data["url"] as string, UriKind.Absolute, out this.pictureUrl);
+					}
+				}
+			}
         }
+#else
+		/// <summary>
+		/// Initializes a new instance of the GraphPlace class from a dynamic object returned by the Facebook API.
+		/// </summary>
+		/// <param name="place">The dynamic object representing the Facebook place.</param>
+		public GraphPlace(dynamic place)
+			: base((IDictionary<string, object>)place)
+		{
+			if (place == null)
+			{
+				throw new ArgumentNullException("place");
+			}
+
+			this.Id = place.id;
+			this.Name = place.name;
+			dynamic location = place.location;
+			this.Location = (location != null) ? new GraphLocation(location) : null;
+			var picture = place.picture;
+			if (picture != null)
+			{
+				Uri.TryCreate(picture.data.url, UriKind.Absolute, out this.pictureUrl);
+			}
+		}
+#endif
 
         /// <summary>
         /// Gets or sets the ID of the place.

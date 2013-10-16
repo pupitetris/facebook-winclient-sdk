@@ -36,6 +36,8 @@
 
             this.Id = this["id"] as string;
             this.Name = this["name"] as string;
+			this.Category = this ["category"] as string;
+			this.WereHereCount = (long) this ["were_here_count"];
             object location = this["location"];
             this.Location = (location != null) ? new GraphLocation(location) : null;
 			IDictionary<string, object> picture = this["picture"] as IDictionary<string, object>;
@@ -65,6 +67,8 @@
 
 			this.Id = place.id;
 			this.Name = place.name;
+			this.Category = place.category;
+			this.WereHereCount = place.were_here_count;
 			dynamic location = place.location;
 			this.Location = (location != null) ? new GraphLocation(location) : null;
 			var picture = place.picture;
@@ -110,5 +114,16 @@
                 this.pictureUrl = value;
             }
         }
+
+		/// <summary>
+		/// Gets or sets the number of people who have checked-in on the place.
+		/// </summary>
+		public long WereHereCount { get; set; }
+
+		/// <summary>
+		///  Gets or sets the type this place belongs to.
+		/// </summary>
+		/// <value>Local Business, Hotel, Organization, etc.</value>
+		public string Category { get; set; }
     }
 }
